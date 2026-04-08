@@ -1,0 +1,471 @@
+.accounts-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.grand-total-card {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 32px;
+  border-radius: var(--radius-xl);
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+  color: white;
+}
+
+.grand-total-card p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.grand-total-card h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.3);
+}
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.account-info h3 {
+  margin-bottom: 4px;
+  font-size: 1.15rem;
+}
+
+.account-info .base-amount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.current-balance {
+  font-size: 1.25rem;
+  font-weight: 700;
+  min-width: 100px;
+  text-align: right;
+}
+
+.current-balance.positive {
+  color: var(--success);
+}
+
+.current-balance.negative {
+  color: var(--danger);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.add-btn {
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.add-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.sub-btn {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.sub-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.share-btn {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.share-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.history-btn {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.history-btn:hover {
+  background: rgba(168, 85, 247, 0.25);
+}
+
+.fab-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  z-index: 50;
+}
+
+.fab-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ─── History Modal ─── */
+
+.history-modal {
+  width: 100%;
+  max-width: 820px;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.history-header h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0;
+}
+
+.history-summary {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 14px 28px;
+  background: rgba(99, 102, 241, 0.06);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.summary-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.summary-value {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.summary-value.positive { color: var(--success); }
+.summary-value.negative { color: var(--danger); }
+
+.summary-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border-color);
+  margin: 0 8px;
+}
+
+.history-table-wrap {
+  max-height: 460px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.history-table thead th {
+  position: sticky;
+  top: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.history-row td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+
+.history-row:last-child td {
+  border-bottom: none;
+}
+
+.history-row.base {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.history-row.plus:hover {
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.history-row.minus:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.date-cell {
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.type-cell { min-width: 90px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge-base {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+}
+
+.badge-plus {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+}
+
+.badge-minus {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.amount-cell {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.note-cell {
+  color: var(--text-muted);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.balance-cell {
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.positive { color: var(--success); }
+.negative { color: var(--danger); }
+
+/* scrollbar for history */
+.history-table-wrap::-webkit-scrollbar { width: 6px; }
+.history-table-wrap::-webkit-scrollbar-track { background: transparent; }
+.history-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.history-table-wrap::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+
+.grand-total-card {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 32px;
+  border-radius: var(--radius-xl);
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+  color: white;
+}
+
+.grand-total-card p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.grand-total-card h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.3);
+}
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.account-info h3 {
+  margin-bottom: 4px;
+  font-size: 1.15rem;
+}
+
+.account-info .base-amount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.current-balance {
+  font-size: 1.25rem;
+  font-weight: 700;
+  min-width: 100px;
+  text-align: right;
+}
+
+.current-balance.positive {
+  color: var(--success);
+}
+
+.current-balance.negative {
+  color: var(--danger);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.add-btn {
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.add-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.sub-btn {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.sub-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.share-btn {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.share-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.fab-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  z-index: 50;
+}
+
+.fab-btn:hover {
+  transform: scale(1.05);
+}
+
+
