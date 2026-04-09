@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Update base URL depending on environment if needed
-const API_URL = 'https://notebook-server-gilt.vercel.app/api';
+const API_URL = 'https://notebook-server-gilt.vercel.app' || 'http://localhost:5000'; 
 
 const api = axios.create({
   baseURL: API_URL,
