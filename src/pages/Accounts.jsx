@@ -121,249 +121,261 @@ const Accounts = () => {
   };
 
   return (
-    <div className="accounts-page animate-fade-in">
-      <div className="flex-between" style={{ marginBottom: '24px' }}>
-        <h2>Accounts / হিসাব</h2>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button className="btn btn-ghost" title="Recycle Bin" onClick={() => navigate('/deleted-accounts')} style={{ color: 'var(--danger)' }}>
-            <Trash2 size={20} />
-          </button>
-          <button className="btn btn-ghost" title="Shared With Me" onClick={() => navigate('/shared-accounts')}>
-            <FolderOpen size={20} />
-          </button>
-          <button className="btn btn-primary" title="Share All" onClick={() => { setIsShareAll(true); setShowShare(true); }}>
-            <Share2 size={20} />
-          </button>
-        </div>
-      </div>
-
-      <div className="grand-total-card">
-        <p>Grand Total (মোট হিসাব)</p>
-        <h1>{formatCurrency(personalTotal)}</h1>
-      </div>
-
-      <div className="accounts-list">
-        {personalAccounts.length === 0 ? (
-          <div className="empty-state">No personal accounts found. Add one!</div>
-        ) : (
-          personalAccounts.map(acc => (
-            <div key={acc._id} className="glass-card account-card">
-              <div className="account-info">
-                <h3>{acc.name}</h3>
-                <span className="base-amount">Base: {formatCurrency(acc.baseAmount)}</span>
-              </div>
-              <div className="account-actions">
-                {/* History Button */}
-                <button
-                  className="icon-btn history-btn"
-                  title="লেনদেনের ইতিহাস"
-                  onClick={() => openHistory(acc)}
-                >
-                  <History size={18} />
-                </button>
-
-                <button className="icon-btn share-btn" onClick={() => { setActiveAcc(acc); setIsShareAll(false); setShowShare(true); }}>
-                  <Share2 size={18} />
-                </button>
-                <div className={`current-balance ${acc.currentBalance >= 0 ? 'positive' : 'negative'}`}>
-                  {formatCurrency(acc.currentBalance)}
-                </div>
-                <button className="icon-btn add-btn" onClick={() => { setActiveAcc(acc); setTrxType('plus'); setShowTrx(true); }}>
-                  <Plus size={18} />
-                </button>
-                <button className="icon-btn sub-btn" onClick={() => { setActiveAcc(acc); setTrxType('minus'); setShowTrx(true); }}>
-                  <Minus size={18} />
-                </button>
-                <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)', margin: '0 4px' }}></div>
-                <button className="icon-btn" style={{ color: 'var(--danger)' }} onClick={() => { if (window.confirm('Delete this account to Recycle Bin?')) deleteAccount(acc._id); }}>
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      <button className="fab-btn" onClick={() => setShowAddAcc(true)}>
-        <Plus size={24} />
-      </button>
-
-      </div>
-    </div>
-    
-    {/* ─── Modals (Rendered via Portal to guarantee they overlay the whole screen) ─── */}
-    {createPortal(
-      <>
-        {/* History Modal */}
-    {showHistory && historyAcc && (() => {
-      const rows = getRunningHistory(historyAcc);
-      const totalIn = historyAcc.transactions.filter(t => t.type === 'plus').reduce((s, t) => s + t.amount, 0);
-      const totalOut = historyAcc.transactions.filter(t => t.type === 'minus').reduce((s, t) => s + t.amount, 0);
-      return (
-        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowHistory(false)}>
-          <div className="glass-panel history-modal animate-fade-in">
-            {/* Header */}
-            <div className="history-header">
-              <div>
-                <h3>{historyAcc.name}</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  লেনদেনের ইতিহাস ({rows.length - 1} টি লেনদেন)
-                </p>
-              </div>
-              <button className="icon-btn" onClick={() => setShowHistory(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Summary row */}
-            <div className="history-summary">
-              <div className="summary-item">
-                <span className="summary-label">বর্তমান ব্যালেন্স</span>
-                <span className={`summary-value ${historyAcc.currentBalance >= 0 ? 'positive' : 'negative'}`}>
-                  {formatCurrency(historyAcc.currentBalance)}
-                </span>
-              </div>
-              <div className="summary-divider" />
-              <div className="summary-item">
-                <TrendingUp size={14} color="var(--success)" />
-                <span className="summary-label">মোট জমা</span>
-                <span className="summary-value positive">{formatCurrency(totalIn)}</span>
-              </div>
-              <div className="summary-divider" />
-              <div className="summary-item">
-                <TrendingDown size={14} color="var(--danger)" />
-                <span className="summary-label">মোট বকেয়া</span>
-                <span className="summary-value negative">{formatCurrency(totalOut)}</span>
-              </div>
-            </div>
-
-            {/* Transaction table */}
-            <div className="history-table-wrap">
-              <table className="history-table">
-                <thead>
-                  <tr>
-                    <th>তারিখ</th>
-                    <th>ধরন</th>
-                    <th>পরিমাণ</th>
-                    <th>রেফারেন্স / নোট</th>
-                    <th>ব্যালেন্স</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, i) => (
-                    <tr key={row.id} className={`history-row ${row.type}`}>
-                      <td className="date-cell">{formatDate(row.date)}</td>
-                      <td className="type-cell">
-                        {row.type === 'base' && (
-                          <span className="badge badge-base">প্রারম্ভিক</span>
-                        )}
-                        {row.type === 'plus' && (
-                          <span className="badge badge-plus">
-                            <ArrowUpCircle size={13} /> জমা
-                          </span>
-                        )}
-                        {row.type === 'minus' && (
-                          <span className="badge badge-minus">
-                            <ArrowDownCircle size={13} /> বকেয়া
-                          </span>
-                        )}
-                      </td>
-                      <td className={`amount-cell ${row.type === 'minus' ? 'negative' : 'positive'}`}>
-                        {row.type === 'minus' ? '−' : '+'}{formatCurrency(row.amount)}
-                      </td>
-                      <td className="note-cell">{row.note}</td>
-                      <td className={`balance-cell ${row.balance >= 0 ? 'positive' : 'negative'}`}>
-                        {formatCurrency(row.balance)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {rows.length === 1 && (
-                <div className="empty-state" style={{ margin: '24px 0' }}>
-                  এখনো কোনো লেনদেন নেই
-                </div>
-              )}
-            </div>
+    <>
+      <div className="accounts-page animate-fade-in">
+        <div className="flex-between" style={{ marginBottom: '24px' }}>
+          <h2>Accounts / হিসাব</h2>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="btn btn-ghost" title="Recycle Bin" onClick={() => navigate('/deleted-accounts')} style={{ color: 'var(--danger)' }}>
+              <Trash2 size={20} />
+            </button>
+            <button className="btn btn-ghost" title="Shared With Me" onClick={() => navigate('/shared-accounts')}>
+              <FolderOpen size={20} />
+            </button>
+            <button className="btn btn-primary" title="Share All" onClick={() => { setIsShareAll(true); setShowShare(true); }}>
+              <Share2 size={20} />
+            </button>
           </div>
         </div>
-      );
-    })()}
 
-    {/* Add Account Modal */}
-    {showAddAcc && (
-      <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowAddAcc(false)}>
-        <div className="glass-panel modal-content animate-fade-in">
-          <h3>Add New Account / নতুন হিসাব</h3>
-          <form onSubmit={handleAddAccount}>
-            <div className="input-group">
-              <label className="input-label">Account Name</label>
-              <input required className="input-field" value={accName} onChange={e => setAccName(e.target.value)} />
-            </div>
-            <div className="input-group" style={{ marginBottom: '24px' }}>
-              <label className="input-label">Starting Balance</label>
-              <input required type="number" className="input-field" value={accBase} onChange={e => setAccBase(e.target.value)} />
-            </div>
-            <div className="flex-between">
-              <button type="button" className="btn btn-ghost" onClick={() => setShowAddAcc(false)}>Cancel</button>
-              <button type="submit" className="btn btn-primary">Add</button>
-            </div>
-          </form>
+        <div className="grand-total-card">
+          <p>Grand Total (মোট হিসাব)</p>
+          <h1>{formatCurrency(personalTotal)}</h1>
         </div>
-      </div>
-    )}
 
-    {/* Add Transaction Modal */}
-    {showTrx && (
-      <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowTrx(false)}>
-        <div className="glass-panel modal-content animate-fade-in">
-          <h3>{trxType === 'plus' ? 'Add Income (+ জমা)' : 'Add Expense (- বকেয়া)'}</h3>
-          <p style={{ marginBottom: '16px' }}>for {activeAcc?.name}</p>
-          <form onSubmit={handleAddTransaction}>
-            <div className="input-group">
-              <label className="input-label">Amount</label>
-              <input required type="number" className="input-field" value={trxAmount} onChange={e => setTrxAmount(e.target.value)} />
-            </div>
-            <div className="input-group" style={{ marginBottom: '24px' }}>
-              <label className="input-label">Note (Optional)</label>
-              <input type="text" className="input-field" value={trxNote} onChange={e => setTrxNote(e.target.value)} />
-            </div>
-            <div className="flex-between">
-              <button type="button" className="btn btn-ghost" onClick={() => setShowTrx(false)}>Cancel</button>
-              <button type="submit" className={`btn ${trxType === 'plus' ? 'btn-primary' : 'btn-danger'}`}>Save</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )}
+        <div className="accounts-list">
+          {personalAccounts.length === 0 ? (
+            <div className="empty-state">No personal accounts found. Add one!</div>
+          ) : (
+            personalAccounts.map(acc => (
+              <div key={acc._id} className="glass-card account-card">
+                <div className="account-info">
+                  <h3>{acc.name}</h3>
+                  <span className="base-amount">Base: {formatCurrency(acc.baseAmount)}</span>
+                </div>
+                <div className="account-actions">
+                  {/* History Button */}
+                  <button
+                    className="icon-btn history-btn"
+                    title="লেনদেনের ইতিহাস"
+                    onClick={() => openHistory(acc)}
+                  >
+                    <History size={18} />
+                  </button>
 
-    {/* Share Modal */}
-    {showShare && (
-      <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowShare(false)}>
-        <div className="glass-panel modal-content animate-fade-in">
-          <h3>{isShareAll ? 'Share All Accounts' : `Share ${activeAcc?.name}`}</h3>
-          <form onSubmit={handleShareSubmit}>
-            <div className="input-group" style={{ marginBottom: '24px' }}>
-              <label className="input-label">Select User to Share With</label>
-              <select required className="input-field" value={shareTarget} onChange={e => setShareTarget(e.target.value)}>
-                <option value="">-- Choose User --</option>
-                {users.map(u => (
-                  <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex-between">
-              <button type="button" className="btn btn-ghost" onClick={() => setShowShare(false)}>Cancel</button>
-              <button type="submit" className="btn btn-primary">Share</button>
-            </div>
-          </form>
+                  <button className="icon-btn share-btn" onClick={() => { setActiveAcc(acc); setIsShareAll(false); setShowShare(true); }}>
+                    <Share2 size={18} />
+                  </button>
+                  <div className={`current-balance ${acc.currentBalance >= 0 ? 'positive' : 'negative'}`}>
+                    {formatCurrency(acc.currentBalance)}
+                  </div>
+                  <button className="icon-btn add-btn" onClick={() => { setActiveAcc(acc); setTrxType('plus'); setShowTrx(true); }}>
+                    <Plus size={18} />
+                  </button>
+                  <button className="icon-btn sub-btn" onClick={() => { setActiveAcc(acc); setTrxType('minus'); setShowTrx(true); }}>
+                    <Minus size={18} />
+                  </button>
+                  <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)', margin: '0 4px' }}></div>
+                  <button className="icon-btn" style={{ color: 'var(--danger)' }} onClick={() => { if (window.confirm('Delete this account to Recycle Bin?')) deleteAccount(acc._id); }}>
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
+
+        <button className="fab-btn" onClick={() => setShowAddAcc(true)}>
+          <Plus size={24} />
+        </button>
       </div>
+      
+      {/* ─── Modals (Rendered via Portal to guarantee they overlay the whole screen) ─── */}
+      {createPortal(
+      <>
+        {/* History Modal */}
+        {showHistory && historyAcc && (() => {
+          const rows = getRunningHistory(historyAcc);
+          const totalIn = historyAcc.transactions.filter(t => t.type === 'plus').reduce((s, t) => s + t.amount, 0);
+          const totalOut = historyAcc.transactions.filter(t => t.type === 'minus').reduce((s, t) => s + t.amount, 0);
+          return (
+            <div className="full-page-overlay animate-slide-up">
+              <div className="full-page-container">
+                <div className="fp-header">
+                  <div>
+                    <h3>{historyAcc.name}</h3>
+                    <p>লেনদেনের ইতিহাস ({rows.length - 1} টি লেনদেন)</p>
+                  </div>
+                  <button className="fp-close-btn" onClick={() => setShowHistory(false)}>
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <div className="fp-content">
+                  <div className="fp-history-summary">
+                    <div className="fp-summary-card">
+                      <div className="label">বর্তমান ব্যালেন্স</div>
+                      <div className={`value ${historyAcc.currentBalance >= 0 ? 'positive' : 'negative'}`}>
+                        {formatCurrency(historyAcc.currentBalance)}
+                      </div>
+                    </div>
+                    <div className="fp-summary-card">
+                      <div className="label"><TrendingUp size={16} color="var(--success)" /> মোট জমা</div>
+                      <div className="value positive">{formatCurrency(totalIn)}</div>
+                    </div>
+                    <div className="fp-summary-card">
+                      <div className="label"><TrendingDown size={16} color="var(--danger)" /> মোট বকেয়া</div>
+                      <div className="value negative">{formatCurrency(totalOut)}</div>
+                    </div>
+                  </div>
+
+                  <div className="history-table-wrap fp-table-wrap">
+                    <table className="history-table">
+                      <thead>
+                        <tr>
+                          <th>তারিখ</th>
+                          <th>ধরন</th>
+                          <th>পরিমাণ</th>
+                          <th>রেফারেন্স / নোট</th>
+                          <th>ব্যালেন্স</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row) => (
+                          <tr key={row.id} className={`history-row ${row.type}`}>
+                            <td className="date-cell">{formatDate(row.date)}</td>
+                            <td className="type-cell">
+                              {row.type === 'base' && <span className="badge badge-base">প্রারম্ভিক</span>}
+                              {row.type === 'plus' && <span className="badge badge-plus"><ArrowUpCircle size={13} /> জমা</span>}
+                              {row.type === 'minus' && <span className="badge badge-minus"><ArrowDownCircle size={13} /> বকেয়া</span>}
+                            </td>
+                            <td className={`amount-cell ${row.type === 'minus' ? 'negative' : 'positive'}`}>
+                              {row.type === 'minus' ? '−' : '+'}{formatCurrency(row.amount)}
+                            </td>
+                            <td className="note-cell">{row.note}</td>
+                            <td className={`balance-cell ${row.balance >= 0 ? 'positive' : 'negative'}`}>
+                              {formatCurrency(row.balance)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {rows.length === 1 && (
+                      <div className="empty-state" style={{ marginTop: '24px' }}>
+                        এখনো কোনো লেনদেন নেই
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Add Account Modal */}
+        {showAddAcc && (
+          <div className="full-page-overlay animate-slide-up">
+            <div className="full-page-container">
+              <div className="fp-header">
+                <h3>Add New Account / নতুন হিসাব</h3>
+                <button className="fp-close-btn" onClick={() => setShowAddAcc(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+              <form onSubmit={handleAddAccount} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div className="fp-content">
+                  <div className="input-group">
+                    <label className="input-label">Account Name / হিসাবের নাম</label>
+                    <input required className="input-field" value={accName} onChange={e => setAccName(e.target.value)} placeholder="Enter account name" />
+                  </div>
+                  <div className="input-group">
+                    <label className="input-label">Starting Balance / প্রারম্ভিক ব্যালেন্স</label>
+                    <input required type="number" className="input-field" value={accBase} onChange={e => setAccBase(e.target.value)} placeholder="0" />
+                  </div>
+                </div>
+                <div className="fp-footer">
+                  <div className="fp-footer-buttons">
+                    <button type="button" className="btn btn-ghost" onClick={() => setShowAddAcc(false)}>Cancel</button>
+                    <button type="submit" className="btn btn-primary">Add Account</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Add Transaction Modal */}
+        {showTrx && (
+          <div className="full-page-overlay animate-slide-up">
+            <div className="full-page-container">
+              <div className="fp-header">
+                <div>
+                  <h3>{trxType === 'plus' ? 'Add Income (+ জমা)' : 'Add Expense (- বকেয়া)'}</h3>
+                  <p>for {activeAcc?.name}</p>
+                </div>
+                <button className="fp-close-btn" onClick={() => setShowTrx(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+              <form onSubmit={handleAddTransaction} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div className="fp-content">
+                  <div className="input-group">
+                    <label className="input-label">Amount / পরিমাণ</label>
+                    <input required type="number" className="input-field" value={trxAmount} onChange={e => setTrxAmount(e.target.value)} placeholder="Enter amount" />
+                  </div>
+                  <div className="input-group">
+                    <label className="input-label">Note / রেফারেন্স (Optional)</label>
+                    <input type="text" className="input-field" value={trxNote} onChange={e => setTrxNote(e.target.value)} placeholder="What was this for?" />
+                  </div>
+                </div>
+                <div className="fp-footer">
+                  <div className="fp-footer-buttons">
+                    <button type="button" className="btn btn-ghost" onClick={() => setShowTrx(false)}>Cancel</button>
+                    <button type="submit" className={`btn ${trxType === 'plus' ? 'btn-primary' : 'btn-danger'}`}>Save Transaction</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Share Modal */}
+        {showShare && (
+          <div className="full-page-overlay animate-slide-up">
+            <div className="full-page-container">
+              <div className="fp-header">
+                <h3>{isShareAll ? 'Share All Accounts' : `Share ${activeAcc?.name}`}</h3>
+                <button className="fp-close-btn" onClick={() => setShowShare(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+              <form onSubmit={handleShareSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div className="fp-content">
+                  <div className="input-group">
+                    <label className="input-label">Select User to Share With</label>
+                    <select required className="input-field" value={shareTarget} onChange={e => setShareTarget(e.target.value)}>
+                      <option value="">-- Choose User --</option>
+                      {users.map(u => (
+                        <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="fp-footer">
+                  <div className="fp-footer-buttons">
+                    <button type="button" className="btn btn-ghost" onClick={() => setShowShare(false)}>Cancel</button>
+                    <button type="submit" className="btn btn-primary">Share</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </>,
+      document.body
     )}
-  </>,
-  document.body
-);
+    </>
+  );
 };
 
 export default Accounts;
