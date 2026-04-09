@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAccounts } from '../context/AccountsContext';
 import api from '../api';
 import { Plus, Minus, Share2, FolderOpen, Trash2, History, TrendingUp, TrendingDown, X, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
@@ -190,8 +191,10 @@ const Accounts = () => {
       </div>
     </div>
     
-    {/* ─── Modals (Outside .animate-fade-in to prevent position:fixed break) ─── */}
-    {/* History Modal */}
+    {/* ─── Modals (Rendered via Portal to guarantee they overlay the whole screen) ─── */}
+    {createPortal(
+      <>
+        {/* History Modal */}
     {showHistory && historyAcc && (() => {
       const rows = getRunningHistory(historyAcc);
       const totalIn = historyAcc.transactions.filter(t => t.type === 'plus').reduce((s, t) => s + t.amount, 0);
@@ -358,7 +361,8 @@ const Accounts = () => {
         </div>
       </div>
     )}
-  </>
+  </>,
+  document.body
 );
 };
 
