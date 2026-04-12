@@ -17,9 +17,9 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
+    { name: 'Accounts / হিসাব', path: '/accounts', icon: <Wallet size={20} /> },
     { name: 'Notes / নোটসমূহ', path: '/', icon: <StickyNote size={20} /> },
     { name: 'Categories / ক্যাটেগরি', path: '/categories', icon: <Tags size={20} /> },
-    { name: 'Accounts / হিসাব', path: '/accounts', icon: <Wallet size={20} /> },
     { name: 'Shared With Me', path: '/shared-accounts', icon: <Share2 size={20} /> },
   ];
 
